@@ -24948,6 +24948,13 @@
 
 	    onSearch: function onSearch(e) {
 	        e.preventDefault();
+	        var location = this.refs.location.value;
+	        var encodedLocation = encodeURIComponent(location);
+
+	        if (location.length > 0) {
+	            this.refs.location.value = '';
+	            window.location.hash = '#/?location=' + location;
+	        }
 	    },
 	    render: function render() {
 	        return React.createElement(
@@ -25005,7 +25012,7 @@
 	                        React.createElement(
 	                            'li',
 	                            null,
-	                            React.createElement('input', { type: 'search', placeholder: 'Search weather by city' })
+	                            React.createElement('input', { type: 'search', placeholder: 'Search weather by city', ref: 'location' })
 	                        ),
 	                        React.createElement(
 	                            'li',
@@ -25045,7 +25052,9 @@
 	        var self = this;
 	        this.setState({
 	            isLoading: true,
-	            errorMessage: undefined
+	            errorMessage: undefined,
+	            location: undefined,
+	            temp: undefined
 	        });
 
 	        openWeatherMap.getTemp(location).then(function (temp) {
@@ -25060,6 +25069,21 @@
 	                errorMessage: e.message
 	            });
 	        });
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var location = this.props.location.query.location;
+	        if (location && location.length > 0) {
+	            this.handleSearch(location);
+	            window.location.hash = '#/';
+	        }
+	    },
+
+	    componentWillReceiveProps: function componentWillReceiveProps(newProps) {
+	        var location = newProps.location.query.location;
+	        if (location && location.length > 0) {
+	            this.handleSearch(location);
+	            window.location.hash = '#/';
+	        }
 	    },
 	    render: function render() {
 	        var _state = this.state,
@@ -25160,7 +25184,7 @@
 	        { className: "text-center" },
 	        "It's it ",
 	        temp,
-	        " in ",
+	        "\xB0C in ",
 	        location,
 	        "!"
 	    );
